@@ -371,6 +371,7 @@ function filter_probes(probes::Vector{String}
                         , upper_gc::Float64
                         , lower_gc::Float64
                         , max_aligned_length::Integer
+                        , max_heterodimer_tm::Integer
                         )
 
     oligo_c = oligo_conc * 1e-6 # μM
@@ -464,7 +465,7 @@ function filter_probes(probes::Vector{String}
                 )
 
                 # If aligned region has a melting temperature less than 25C, add to list
-                if salt_adj_aligned_melting_temperature < 25
+                if salt_adj_aligned_melting_temperature < max_heterodimer_tm
                     push!(promising_probes, current_probe)
                 end
             end
@@ -853,6 +854,10 @@ function parse_commandline()
             temperature above."
             arg_type = Int
             default = 65
+        "--heterodimer", "-H"
+            help = "Set the maximum allowed homodimer sequence melting temperature, in Celsius."
+            arg_type = Int
+            default = 25
         "--delta-g", "-G"
             help = "This will serve as the threshold at which all potential probes must have no \
             homodimer sequence with a delta G below it."
@@ -900,6 +905,7 @@ function julia_main()::Cint
                                     , parsed_args["upper"]
                                     , parsed_args["lower"]
                                     , parsed_args["max"]
+                                    , parsed_args["heterodimer"]
     )
     
     write_output(probes_dict, promising_probes, parsed_args["out"])
