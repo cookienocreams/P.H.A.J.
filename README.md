@@ -1,5 +1,5 @@
 # DNA_probe_filter
-Basic filtering of potential DNA hybridization probes
+Basic filtering of potential DNA hybridization probes based on GC content, homodimer and heterodimer formation, and melting temperature.
 
 ## Installation instructions
 
@@ -29,9 +29,14 @@ using PackageCompiler
 PackageCompiler.create_app("./", "/home/user/probe_filter_app", incremental=true, precompile_execution_file="./src/dna_probe_filter.jl", include_lazy_artifacts=true)
 ```
 
+There are numerous options that can be changed if desired. Use `-h` or `--help` flags to see options.
+
+```bash
+/home/user/probe_filter_app/bin/dna_probe_filter --help
+```
+
 The app can be run using the `dna_probe_filter` executable in the `/home/user/probe_filter_app/bin` folder in a folder containing fasta to be analyzed. Note probes are expected to be in a standard fasta format with a different name for each probe.
 
 ```bash
-cd fastqs
-/home/user/probe_filter_app/bin/dna_probe_filter
+/home/user/probe_filter_app/bin/dna_probe_filter sample.fasta
 ```
