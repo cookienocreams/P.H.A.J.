@@ -105,10 +105,10 @@ end
 
 """
     sequence_thermodynamic_sum(delta_h::Vector{Float64}
-                                    , delta_s::Vector{Float64}
-                                    , nn_pairs_list::Vector{String}
-                                    , sequence_nn_list::Vector{String}
-                                    )
+                                , delta_s::Vector{Float64}
+                                , nn_pairs_list::Vector{String}
+                                , sequence_nn_list::Vector{String}
+                                )
 
 Calculate the total enthalpy and entropy of each sequence.
 
@@ -280,7 +280,7 @@ function build_longest_common_prefix(sequence::String, suffix_array::Vector{Int}
 end
 
 """
-    find_homodimers(sequence::String) -> Set{String}
+    find_homodimers(sequence::String) -> Vector{String}
 
 Identify all homodimers in a given DNA sequence using a suffix array and LCP array.
 
@@ -288,7 +288,7 @@ Identify all homodimers in a given DNA sequence using a suffix array and LCP arr
 - `sequence::String`: A DNA sequence string.
 
 # Returns
-- A `Set{String}` containing all identified homodimers in the sequence.
+- A `Vector{String}` containing all identified homodimers in the sequence.
 
 # Explanation
 The function combines the sequence with its reverse complement and builds a suffix 
@@ -325,17 +325,17 @@ end
 
 """
     filter_probes(probes::Vector{String}
-                        , temperature_threshold::Integer
-                        , monovalent::Float64
-                        , mg::Float64
-                        , dntps::Float64
-                        , oligo_conc::Float64
-                        , delta_g_threshold::Float64
-                        , upper_gc::Float64
-                        , lower_gc::Float64
-                        , max_aligned_length::Integer
-                        , max_heterodimer_tm::Integer
-                        )
+                    , temperature_threshold::Integer
+                    , monovalent::Float64
+                    , mg::Float64
+                    , dntps::Float64
+                    , oligo_conc::Float64
+                    , delta_g_threshold::Float64
+                    , upper_gc::Float64
+                    , lower_gc::Float64
+                    , max_aligned_length::Integer
+                    , max_heterodimer_tm::Integer
+                    )
 
 Filter probes based on the adjusted melting temperature with respect to a temperature threshold. 
 Calculates the adjusted melting temperature for pairs of sequences and returns those sequences 
@@ -479,12 +479,13 @@ end
 
 """
     check_probe_tm(probe::String
-                 , temperature_threshold::Integer
-                 , monovalent::Float64
-                 , nn::nn_params
-                 , oligo_c::Float64
-                 , dntps::Float64
-                 , mg::Float64)
+                    , temperature_threshold::Integer
+                    , monovalent::Float64
+                    , nn::nn_params
+                    , oligo_c::Float64
+                    , dntps::Float64
+                    , mg::Float64
+                    )
 
 Check if all slices of a DNA probe sequence have melting temperatures (`Tm`) above a 
 set threshold. The function splits the probe into roughly two equal slices and calculates 
@@ -510,7 +511,7 @@ uniform hybridization across the probe is desired.
 
 # Examples
 ```julia
-probe = "AGTCGATCGA"
+probe = ""AATTATGACTGGGAAAGTAAACCGCCTCCACGTAAGCAAGGAAGGCATTCCAATTGTCGAACGGACTGAAGTTTCGGATA"
 threshold = 60
 monovalent_concentration = 50
 nn_parameters = nn_params()
@@ -523,7 +524,8 @@ result = check_probe_tm(probe
                         , nn_parameters
                         , oligo_concentration
                         , dNTP_concentration
-                        , mg_concentration)
+                        , mg_concentration
+                        )
 """
 function check_probe_tm(probe::String
                         , temperature_threshold::Integer
@@ -633,12 +635,16 @@ function calculate_thermodynamic_parameters(sequence::AbstractString, nn::nn_par
     sequence_NN_list = [sequence[i:i+1] for i in 1:sequence_length-1]
 
     # Lists of each nearest neighbor's entropy and enthalpy values that will be used to calculate the thermodynamic values of each sequence
-    delta_s = [nn.AA_delta_s, nn.AC_delta_s, nn.AG_delta_s, nn.AT_delta_s, nn.CA_delta_s, nn.CC_delta_s, nn.CG_delta_s, nn.GA_delta_s, nn.GC_delta_s, nn.TA_delta_s]
-    delta_h = [nn.AA_delta_h, nn.AC_delta_h, nn.AG_delta_h, nn.AT_delta_h, nn.CA_delta_h, nn.CC_delta_h, nn.CG_delta_h, nn.GA_delta_h, nn.GC_delta_h, nn.TA_delta_h]
+    delta_s = [nn.AA_delta_s, nn.AC_delta_s, nn.AG_delta_s, nn.AT_delta_s, nn.CA_delta_s
+                , nn.CC_delta_s, nn.CG_delta_s, nn.GA_delta_s, nn.GC_delta_s, nn.TA_delta_s
+    ]
+    delta_h = [nn.AA_delta_h, nn.AC_delta_h, nn.AG_delta_h, nn.AT_delta_h, nn.CA_delta_h
+                , nn.CC_delta_h, nn.CG_delta_h, nn.GA_delta_h, nn.GC_delta_h, nn.TA_delta_h
+    ]
 
     sequence_total_dh, sequence_total_ds = sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
     # Calculate Gibb's free energy
-    aligned_delta_g = sequence_total_dh - (273.15 * (sequence_total_ds/1000))
+    aligned_delta_g = sequence_total_dh - (273.15 * (sequence_total_ds / 1000))
 
     return aligned_delta_g, sequence_total_dh, sequence_total_ds
 end
@@ -681,7 +687,7 @@ function calculate_thermodynamic_parameters(sequence::AbstractString, monovalent
     sequence_dh_total = (if sequence_terminal_bases in ["YY","RR"] sequence_dh_init + YY_h else sequence_dh_init + RY_h end)
 
     # Calculate Gibb's free energy
-    aligned_delta_g = sequence_dh_total - (273.15 * (sequence_total_ds/1000))
+    aligned_delta_g = sequence_dh_total - (273.15 * (sequence_total_ds / 1000))
 
     return aligned_delta_g, sequence_dh_total, sequence_total_ds
 end
