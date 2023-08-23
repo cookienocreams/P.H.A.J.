@@ -547,13 +547,13 @@ function check_probe_tm(probe::String
         melting_temperature = (1000 * total_dh) / (total_ds + (gas_constant * (log(oligo_c)))) - 273.15
         salt_adj_melting_temperature = probe_tm_salt_correction(melting_temperature, monovalent, mg, dntps, sequence_gc, length(slice))
         push!(slice_tms, salt_adj_melting_temperature)
+    end
 
-        # Return true if all slices have a melting temperature above the threshold
-        if all(>(temperature_threshold), slice_tms)
-            return true
-        else 
-            return false
-        end
+    # Return true if all slices have a melting temperature above the threshold
+    if all(>(temperature_threshold), slice_tms)
+        return true
+    else 
+        return false
     end
 end
 
