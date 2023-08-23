@@ -160,7 +160,6 @@ function gc_content(sequence::LongSequence{DNAAlphabet{4}})::Float64
     return gc_count / length(sequence)
 end
 
-
 """
     sortbyrank(i::Int, j::Int, rank::Vector{Int}, k::Int, len::Int) -> Bool
 
@@ -335,6 +334,7 @@ end
                         , upper_gc::Float64
                         , lower_gc::Float64
                         , max_aligned_length::Integer
+                        , max_heterodimer_tm::Integer
                         )
 
 Filter probes based on the adjusted melting temperature with respect to a temperature threshold. 
@@ -353,6 +353,8 @@ for the aligned region of each sequence pair.
 - `upper_gc::Float64`: Upper bound for cutoff based on percent GC, range 0-1.0.
 - `lower_gc::Float64`: Lower bound for cutoff based on percent GC, range 0-1.0.
 - `max_aligned_length::Integer`: Maximum length of complementary bps a probe can have with other probes.
+- `max_heterodimer_tm::Integer`: Maximum melting temperature a stretch of heterodimer bases can have 
+with another probe.
 
 # Returns
 - `promising_probes`: A set of sequences with adjusted melting temperatures below the temperature threshold.
