@@ -345,11 +345,17 @@ for the aligned region of each sequence pair.
 # Arguments
 - `probes::Vector{String}`: A vector of DNA sequences (probes) to be filtered.
 - `temperature_threshold::Integer`: A temperature threshold (in Celsius) to filter the probes.
+- `monovalent::Int64`: Concentration of monovalent ions in mM.
+- `mg::Float64`: Concentration of magnesium ions in mM.
+- `dntps::Float64`: Concentration of dNTPs in mM.
+- `oligo_c::Float64`: Oligo concentration in μM.
+- `delta_g_threshold::Float64`: Delta G threshold for homodimer sequences in kcal/mol.
+- `upper_gc::Float64`: Upper bound for cutoff based on percent GC, range 0-1.0.
+- `lower_gc::Float64`: Lower bound for cutoff based on percent GC, range 0-1.0.
+- `max_aligned_length::Integer`: Maximum length of complementary bps a probe can have with other probes.
 
 # Returns
 - `promising_probes`: A set of sequences with adjusted melting temperatures below the temperature threshold.
-- `match_info`: A dictionary mapping sequences to a tuple of Gibbs free energy for the aligned region and 
-   the maximum Gibbs free energy for the entire sequence.
 
 # Notes
 The function considers various thermodynamic and environmental parameters, such as mono- and divalent ion concentrations, 
@@ -383,21 +389,23 @@ function filter_probes(probes::Vector{String}
                mismatch=-4,
                gap_open=-5,
                gap_extend=-3
-           )
+    )
     
     # Loop through the input sequences and calculate each one's delta G
     # Loops are designed to ensure that each pair of sequences is compared only once
     for i in 1:number_of_probes
 
+        current_probe = probes[i]
+
         # Get probe percent GC
-        gc = gc_content(LongDNA{4}(probes[i]))
+        gc = gc_content(LongDNA{4}(current_probe))
         # Skip probes that have a percent GC more than the set thresholds
         if gc > upper_gc || gc < lower_gc
             continue
         end
 
         # Homo dimer analysis
-        homo_dimers = find_homodimers(LongDNA{4}(probes[i]))
+        homo_dimers = find_homodimers(LongDNA{4}(current_probe))
         # Only return the highest delta G value
         max_homo_dimer_delta_g = 0.0
         if !isempty(homo_dimers)
@@ -409,7 +417,7 @@ function filter_probes(probes::Vector{String}
             end
         end
 
-        # Skip probes that have a stretch of complementary bases with a delta G below threshold in kcal/mol
+        # Skip probes that have a stretch of complementary bases with a delta G below threshold
         if max_homo_dimer_delta_g < delta_g_threshold
             continue
         end
@@ -418,20 +426,21 @@ function filter_probes(probes::Vector{String}
 
             # Hetero-dimer analysis
             alignment_result = pairalign(SemiGlobalAlignment()
-                                        , LongDNA{4}(probes[i])
+                                        , LongDNA{4}(current_probe)
                                         , BioSequences.reverse_complement(LongDNA{4}(probes[j]))
                                         , scoremodel
                                         )
             alignment_anchors = alignment(alignment_result).a.aln.anchors
             longest_aligned_region!(region, alignment_anchors)
-            aligned_seq = probes[i][region.start+1:region.stop]
+            aligned_seq = current_probe[region.start+1:region.stop]
 
             # Skip probes that have more than 5 bp of alignment to other probes
             if length(aligned_seq) > max_aligned_length
                 continue
             end
 
-            tm_okay = check_probe_tm(probes[i], temperature_threshold, monovalent, nn, oligo_c, dntps, mg)
+            # Ensure probe melting temperature is above threshold
+            tm_okay = check_probe_tm(current_probe, temperature_threshold, monovalent, nn, oligo_c, dntps, mg)
 
             # Continue if probe Tm is above the threshold
             if tm_okay
@@ -446,11 +455,17 @@ function filter_probes(probes::Vector{String}
                 aligned_gc = gc_content(LongDNA{4}(aligned_seq))
 
                 # Adjust melting temperature for the specific reactiion conditions
-                salt_adj_aligned_melting_temperature = probe_tm_salt_correction(aligned_melting_temperature, monovalent, mg, dntps, aligned_gc, length(aligned_seq))
+                salt_adj_aligned_melting_temperature = probe_tm_salt_correction(aligned_melting_temperature
+                                                                                , monovalent
+                                                                                , mg
+                                                                                , dntps
+                                                                                , aligned_gc
+                                                                                , length(aligned_seq)
+                )
 
                 # If aligned region has a melting temperature less than 25C, add to list
                 if salt_adj_aligned_melting_temperature < 25
-                    push!(promising_probes, probes[i])
+                    push!(promising_probes, current_probe)
                 end
             end
         end
