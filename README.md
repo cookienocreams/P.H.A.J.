@@ -29,7 +29,7 @@ using PackageCompiler
 PackageCompiler.create_app("./", "/home/user/probe_filter_app", incremental=true, precompile_execution_file="./src/dna_probe_filter.jl", include_lazy_artifacts=true)
 ```
 
-The app can be run using the `dna_probe_filter executable` in the `/home/user/probe_filter_app/bin` folder in a folder containing fasta to be analyzed. Note probes are expected to be in a standard fasta format with a different name for each probe.
+The app can be run using the `dna_probe_filter` executable in the `/home/user/probe_filter_app/bin` folder in a folder containing fasta to be analyzed. Note probes are expected to be in a standard fasta format with a different name for each probe.
 
 ```bash
 cd fastqs
