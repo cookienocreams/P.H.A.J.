@@ -156,10 +156,10 @@ Calculate the GC content of a given DNA sequence.
 - The percentage of G and C bases in the given sequence.
 """
 function gc_content(sequence::LongSequence{DNAAlphabet{4}})::Float64
-    gc_bases = Set([DNA_G, DNA_C])
-    gc_count = count(base -> base in gc_bases, sequence)
+    gc_count = count(base -> (base === DNA_G || base === DNA_C), sequence)
     return gc_count / length(sequence)
 end
+
 
 """
     sortbyrank(i::Int, j::Int, rank::Vector{Int}, k::Int, len::Int) -> Bool
@@ -305,7 +305,7 @@ function find_homodimers(sequence::LongSequence{DNAAlphabet{4}})
     suffix_array = build_suffix_array(combined_sequence)
     lcp = build_longest_common_prefix(combined_sequence, suffix_array)
 
-    homodimers = Set{String}()
+    homodimers = Vector{String}()
     len_original = length(sequence)
 
     for i in eachindex(lcp)
@@ -398,16 +398,19 @@ function filter_probes(probes::Vector{String}
 
         # Homo dimer analysis
         homo_dimers = find_homodimers(LongDNA{4}(probes[i]))
-        homo_dimer_delta_g_values = Vector{Float64}()
+        # Only return the highest delta G value
+        max_homo_dimer_delta_g = 0.0
         if !isempty(homo_dimers)
             for homo_dimer in homo_dimers
                 homo_dimer_delta_g, _, _ = calculate_thermodynamic_parameters(string(homo_dimer), nn)
-                push!(homo_dimer_delta_g_values, homo_dimer_delta_g)
+                if homo_dimer_delta_g < max_homo_dimer_delta_g
+                    max_homo_dimer_delta_g = homo_dimer_delta_g
+                end
             end
         end
 
         # Skip probes that have a stretch of complementary bases with a delta G below threshold in kcal/mol
-        if any(<(delta_g_threshold), homo_dimer_delta_g_values)
+        if max_homo_dimer_delta_g < delta_g_threshold
             continue
         end
 
@@ -773,15 +776,17 @@ function compute_tm_adjustment(tm, gc, len, mg, mon=nothing)
     return round((1 / salty) - 273.15, digits=1)
 end
 
-# Helper function for computing temperature from salt factor
+# Helper function for computing melting temperature from salt factor
 function compute_tm_from_salt(tm, mon_tm_factor)
     salty = (1 / (tm + 273.15)) + mon_tm_factor
     return round((1 / salty) - 273.15, digits=1)
 end
 
 # Write output file with probes that passed filters
-function write_output(probes_dict::Dict{String, String}, promising_probes::Set{AbstractString})
-    open("promising_probes.fa", "w") do output_file
+function write_output(probes_dict::Dict{String, String}
+                    , promising_probes::Set{AbstractString}
+                    , output_file::String)
+    open(output_file, "w") do output_file
         for probe in promising_probes
             write(output_file, string(">", probes_dict[probe], "\n", probe, "\n"))
         end
@@ -802,6 +807,7 @@ function read_fasta(input_fasta::String)
     return probes
 end
 
+# Get arguments from the command line
 function parse_commandline()
     settings = ArgParseSettings(prog="Hybridization Probe Filter"
                                 , description = "Basic filtering of potential DNA hybridization
@@ -811,19 +817,19 @@ function parse_commandline()
 
     @add_arg_table! settings begin
         "--mono", "-m"
-            help = "Set monovalent ion concentration present in reaction, in mM"
+            help = "Set monovalent ion concentration present in reaction, in mM."
             arg_type = Float64
             default = 50.0
         "--mg", "-M"
-            help = "Set magnesium concentration present in reaction, in mM"
+            help = "Set magnesium concentration present in reaction, in mM."
             arg_type = Float64
             default = 2.0
         "--dntps", "-d"
-            help = "Set dNTP concentration present in reaction, in mM"
+            help = "Set dNTP concentration present in reaction, in mM."
             arg_type = Float64
             default = 0.0
         "--oligo", "-c"
-            help = "Set total probe oligo concentration present in reaction, in μM"
+            help = "Set total probe oligo concentration present in reaction, in μM."
             arg_type = Float64
             default = .25
         "--temp", "-t"
@@ -851,8 +857,12 @@ function parse_commandline()
             help = "Maximum length of complementary bps a probe can have with other probes."
             arg_type = Int
             default = 5
+        "--out", "-o"
+            help = "Output filename for fasta containing promising probes."
+            arg_type = String
+            default = "promising_probes.fa"
         "fasta"
-            help = "The input fasta file containing hybridization probes to be filtered"
+            help = "The input fasta file containing hybridization probes to be filtered."
             required = true
     end
 
@@ -877,10 +887,9 @@ function julia_main()::Cint
                                     , parsed_args["max"]
     )
     
-    write_output(probes_dict, promising_probes)
+    write_output(probes_dict, promising_probes, parsed_args["out"])
 
     return 0
 end
 
 end # module hybrid_probe_filter
-
