@@ -306,6 +306,27 @@ end
         @test region.start == expected.start
     end
 
+    @testset "non-standard bases" begin
+        region = dpf.Region(0, 0)
+        scoremodel = dpf.AffineGapScoreModel(
+               match=5,
+               mismatch=-4,
+               gap_open=-5,
+               gap_extend=-3
+        )
+        probe_a = dpf.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
+        probe_b = dpf.dna"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+        alignment_result = dpf.pairalign(dpf.SemiGlobalAlignment()
+                                        , probe_a
+                                        , dpf.reverse_complement(probe_b)
+                                        , scoremodel
+        )
+        alignment_anchors = dpf.alignment(alignment_result).a.aln.anchors
+        dpf.longest_aligned_region!(region, alignment_anchors)
+        expected = dpf.Region(0, 0)
+        @test region.start == expected.start
+    end
+
     @testset "truncated probe" begin
         region = dpf.Region(0, 0)
         scoremodel = dpf.AffineGapScoreModel(
