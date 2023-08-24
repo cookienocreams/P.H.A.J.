@@ -1,4 +1,4 @@
-module hybrid_probe_filter
+module dna_probe_filter
 
 using ArgParse
 using BioAlignments
@@ -450,7 +450,7 @@ function filter_probes(probes::Vector{String}
                 # Calculate probe enthalpy and entropy values
                 _, aligned_total_dh, aligned_total_ds = calculate_thermodynamic_parameters(aligned_seq, nn)
 
-                # Determine the melting temperature of the sequence at 1M monovalent salt, 
+                # Determine the melting temperature of the sequence at 1 M monovalent salt, 
                 # still needs adjustment to account for actual salt concentration + Mg2+ and dNTPs
                 aligned_melting_temperature = (1000 * aligned_total_dh) / (aligned_total_ds + (gas_constant * (log(oligo_c)))) - 273.15
  
@@ -511,7 +511,7 @@ uniform hybridization across the probe is desired.
 
 # Examples
 ```julia
-probe = ""AATTATGACTGGGAAAGTAAACCGCCTCCACGTAAGCAAGGAAGGCATTCCAATTGTCGAACGGACTGAAGTTTCGGATA"
+probe = "AATTATGACTGGGAAAGTAAACCGCCTCCACGTAAGCAAGGAAGGCATTCCAATTGTCGAACGGACTGAAGTTTCGGATA"
 threshold = 60
 monovalent_concentration = 50
 nn_parameters = nn_params()
@@ -622,33 +622,6 @@ monovalent_concentration = 50
 nn_parameters = nn_params()
 ΔG, ΔH, ΔS = calculate_thermodynamic_parameters(seq, monovalent_concentration, nn_parameters)
 """
-function calculate_thermodynamic_parameters(sequence::AbstractString, nn::nn_params)
-
-    # List of all the nearest-neighbor pairs
-    nn_pairs_list::Vector{String} = ["AA, TT", "AC, TG", "AG, TC", "AT", "CA, GT"
-                                    , "CC, GG", "CG", "GA, CT", "GC", "TA"
-    ]
-
-    sequence_length = length(sequence)
-
-    # Split input sequences into doublets for easy NN matching below
-    sequence_NN_list = [sequence[i:i+1] for i in 1:sequence_length-1]
-
-    # Lists of each nearest neighbor's entropy and enthalpy values that will be used to calculate the thermodynamic values of each sequence
-    delta_s = [nn.AA_delta_s, nn.AC_delta_s, nn.AG_delta_s, nn.AT_delta_s, nn.CA_delta_s
-                , nn.CC_delta_s, nn.CG_delta_s, nn.GA_delta_s, nn.GC_delta_s, nn.TA_delta_s
-    ]
-    delta_h = [nn.AA_delta_h, nn.AC_delta_h, nn.AG_delta_h, nn.AT_delta_h, nn.CA_delta_h
-                , nn.CC_delta_h, nn.CG_delta_h, nn.GA_delta_h, nn.GC_delta_h, nn.TA_delta_h
-    ]
-
-    sequence_total_dh, sequence_total_ds = sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
-    # Calculate Gibb's free energy
-    aligned_delta_g = sequence_total_dh - (273.15 * (sequence_total_ds / 1000))
-
-    return aligned_delta_g, sequence_total_dh, sequence_total_ds
-end
-
 function calculate_thermodynamic_parameters(sequence::AbstractString, monovalent::Float64, nn::nn_params)
 
     # List of all the nearest-neighbor pairs
@@ -690,6 +663,33 @@ function calculate_thermodynamic_parameters(sequence::AbstractString, monovalent
     aligned_delta_g = sequence_dh_total - (273.15 * (sequence_total_ds / 1000))
 
     return aligned_delta_g, sequence_dh_total, sequence_total_ds
+end
+
+function calculate_thermodynamic_parameters(sequence::AbstractString, nn::nn_params)
+
+    # List of all the nearest-neighbor pairs
+    nn_pairs_list::Vector{String} = ["AA, TT", "AC, TG", "AG, TC", "AT", "CA, GT"
+                                    , "CC, GG", "CG", "GA, CT", "GC", "TA"
+    ]
+
+    sequence_length = length(sequence)
+
+    # Split input sequences into doublets for easy NN matching below
+    sequence_NN_list = [sequence[i:i+1] for i in 1:sequence_length-1]
+
+    # Lists of each nearest neighbor's entropy and enthalpy values that will be used to calculate the thermodynamic values of each sequence
+    delta_s = [nn.AA_delta_s, nn.AC_delta_s, nn.AG_delta_s, nn.AT_delta_s, nn.CA_delta_s
+                , nn.CC_delta_s, nn.CG_delta_s, nn.GA_delta_s, nn.GC_delta_s, nn.TA_delta_s
+    ]
+    delta_h = [nn.AA_delta_h, nn.AC_delta_h, nn.AG_delta_h, nn.AT_delta_h, nn.CA_delta_h
+                , nn.CC_delta_h, nn.CG_delta_h, nn.GA_delta_h, nn.GC_delta_h, nn.TA_delta_h
+    ]
+
+    sequence_total_dh, sequence_total_ds = sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
+    # Calculate Gibb's free energy
+    aligned_delta_g = sequence_total_dh - (273.15 * (sequence_total_ds / 1000))
+
+    return aligned_delta_g, sequence_total_dh, sequence_total_ds
 end
 
 """
@@ -921,4 +921,4 @@ function julia_main()::Cint
     return 0
 end
 
-end # module hybrid_probe_filter
+end # module dna_probe_filter
