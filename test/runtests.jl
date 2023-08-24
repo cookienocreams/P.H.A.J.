@@ -189,12 +189,12 @@ end
         mg_concentration = 2.0
         nn_parameters = dpf.nn_params()
         result = dpf.check_probe_tm(probe
-                                                , threshold
-                                                , monovalent_concentration
-                                                , nn_parameters
-                                                , oligo_concentration
-                                                , dNTP_concentration
-                                                , mg_concentration
+                                    , threshold
+                                    , monovalent_concentration
+                                    , nn_parameters
+                                    , oligo_concentration
+                                    , dNTP_concentration
+                                    , mg_concentration
         )
         expected = true
         @test result == expected
@@ -209,12 +209,12 @@ end
         mg_concentration = 2.0
         nn_parameters = dpf.nn_params()
         result = dpf.check_probe_tm(probe
-                                                , threshold
-                                                , monovalent_concentration
-                                                , nn_parameters
-                                                , oligo_concentration
-                                                , dNTP_concentration
-                                                , mg_concentration
+                                    , threshold
+                                    , monovalent_concentration
+                                    , nn_parameters
+                                    , oligo_concentration
+                                    , dNTP_concentration
+                                    , mg_concentration
         )
         expected = false
         @test result == expected
@@ -257,7 +257,7 @@ end
         @test result == expected
     end
 
-    @testset "no end temp" begin
+    @testset "no end base tm adjustment" begin
         probe = "TTTAAACCTC"
         nn_parameters = dpf.nn_params()
         result = dpf.calculate_thermodynamic_parameters(probe, nn_parameters)
@@ -265,7 +265,7 @@ end
         @test result == expected
     end
     
-    @testset "all A bases" begin
+    @testset "all same base" begin
         probe = "AAAAAAAAAA"
         monovalent = 50.0
         nn_parameters = dpf.nn_params()
@@ -363,7 +363,7 @@ end
                                             , dNTPs
                                             , probe_gc
                                             , probe_length
-                                            )
+        )
         expected = 54.7
         @test result == expected
     end
@@ -381,7 +381,7 @@ end
                                             , dNTPs
                                             , probe_gc
                                             , probe_length
-                                            )
+        )
         expected = -8.3
         @test result == expected
     end
@@ -399,7 +399,7 @@ end
                                             , dNTPs
                                             , probe_gc
                                             , probe_length
-                                            )
+        )
         expected = NaN
         @test isnan(result)
     end
@@ -417,7 +417,7 @@ end
                                             , dNTPs
                                             , probe_gc
                                             , probe_length
-                                            )
+        )
         expected = 89.7 # This seems strange
         @test result == expected
     end
