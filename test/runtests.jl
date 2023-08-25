@@ -114,7 +114,7 @@ end
         @test result == expected
     end
 
-    @testset "lowercse all GC" begin
+    @testset "lowercase all GC" begin
         probe = dpf.dna"gcgcgcgcgcgcgcgcgc"
         result = dpf.gc_content(probe)
         expected = 1.0
@@ -154,7 +154,7 @@ end
         @test result == expected
     end
     
-    @testset "same base suffix array" begin
+    @testset "same base suffix array into lcp" begin
         probe = "AAAAAAAAAA"
         suffix_array = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
         result = dpf.build_longest_common_prefix(probe, suffix_array)
@@ -171,7 +171,7 @@ end
         @test result == expected
     end
     
-    @testset "same base suffix array" begin
+    @testset "no homodimer" begin
         probe = dpf.dna"AAAAAAAAAA"
         result = dpf.find_homodimers(probe)
         expected = String[]
