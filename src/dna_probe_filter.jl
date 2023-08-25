@@ -4,6 +4,7 @@ using ArgParse
 using BioAlignments
 using BioSequences
 using Random
+using ProgressMeter
 
 # Ideal gas constant R
 const gas_constant = 1.98720425864083 # cal*K−1*mol−1
@@ -74,6 +75,23 @@ A mutable structure that represents a region in a sequence. `start` and `stop` a
 mutable struct Region
     start::Int
     stop::Int
+end
+
+"""
+Update progress bar on the command line.
+"""
+function progress_bar_update(number_of_records::Int64
+                            , interval::Number
+                            , description::String
+                            )
+    progress_bar_update = Progress(number_of_records
+    , dt=interval
+    , barglyphs=BarGlyphs("[=> ]")
+    , barlen=100
+    , desc=description
+    )
+
+    return progress_bar_update
 end
 
 """
@@ -380,6 +398,11 @@ function filter_probes(probes::Vector{String}
                         , max_heterodimer_tm::Integer
                         )
 
+    number_of_probes = length(probes)
+    update_progress_bar = progress_bar_update(number_of_probes
+                                            , .5
+                                            , "Filtering probes..."
+                                            )
     oligo_c = oligo_conc * 1e-6 # μM
 
     # Reuse the same Region object for all comparisons
@@ -390,7 +413,6 @@ function filter_probes(probes::Vector{String}
 
     promising_probes = Set{AbstractString}()
 
-    number_of_probes = length(probes)
     scoremodel = AffineGapScoreModel(
                match=5,
                mismatch=-4,
@@ -408,6 +430,7 @@ function filter_probes(probes::Vector{String}
         gc = gc_content(LongDNA{4}(current_probe))
         # Skip probes that have a percent GC more than the set thresholds
         if gc > upper_gc || gc < lower_gc
+            next!(update_progress_bar)
             continue
         end
 
@@ -426,6 +449,7 @@ function filter_probes(probes::Vector{String}
 
         # Skip probes that have a stretch of complementary bases with a delta G below threshold
         if max_homo_dimer_delta_g < delta_g_threshold
+            next!(update_progress_bar)
             continue
         end
 
@@ -476,6 +500,7 @@ function filter_probes(probes::Vector{String}
                 end
             end
         end
+        next!(update_progress_bar)
     end
 
     return promising_probes
