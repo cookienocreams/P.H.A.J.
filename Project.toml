@@ -1,6 +1,6 @@
 name = "dna_probe_filter"
 uuid = "9174205a-1b14-4a89-98b3-ea7d13d1d06e"
-authors = ["hawk "]
+authors = ["cookienocreams "]
 version = "0.1.0"
 
 [deps]
