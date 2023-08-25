@@ -291,13 +291,18 @@ Identify all homodimers in a given DNA sequence using a suffix array and LCP arr
 - A `Vector{String}` containing all identified homodimers in the sequence.
 
 # Explanation
-The function combines the sequence with its reverse complement and builds a suffix 
-array and LCP array for this combined sequence. It then checks the LCP values to 
-identify overlapping regions between the original sequence and its complement, 
-which indicate homodimers.
+This function aims to identify regions in the provided DNA sequence where the sequence 
+is its own complement, known as homodimers. To do this, the sequence is combined with 
+its reverse complement. The reason for using the reverse complement (rather than the 
+simple complement) is that DNA naturally binds in an antiparallel fashion. In other 
+words, when looking for a region in the sequence that can form a homodimer (with itself), 
+it is the reverse complement of a subsequence that will align with and bind to that subsequence.
+
+It then checks the LCP values to identify overlapping regions between the original 
+sequence and its complement, which indicate homodimers.
 """
 function find_homodimers(sequence::LongSequence{DNAAlphabet{4}})
-    # Create a sequence with its complement
+    # Create a sequence with its reverse complement
     rev_complement_seq = BioSequences.reverse_complement(sequence)
     combined_sequence = string(sequence, rev_complement_seq)
 
