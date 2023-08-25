@@ -8,3 +8,9 @@ ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 BioAlignments = "00701ae9-d1dc-5365-b64a-a3a3ebf5695e"
 BioSequences = "7e6ae17a-c86d-528c-b3b9-7f778a29fe59"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
