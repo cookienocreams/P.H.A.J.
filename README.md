@@ -35,8 +35,18 @@ There are numerous options that can be changed if desired. Use `-h` or `--help` 
 /home/user/probe_filter_app/bin/dna_probe_filter --help
 ```
 
+## Basic usage
+
 The app can be run using the `dna_probe_filter` executable in the `/home/user/probe_filter_app/bin` folder in a folder containing fasta to be analyzed. Note probes are expected to be in a standard fasta format with a different name for each probe.
 
 ```bash
 /home/user/probe_filter_app/bin/dna_probe_filter sample.fasta
+```
+
+Using the sample input fasta file, `all_probes.fa`, in `test/`, the program can be test on a dataset which contains 5000 randomly generated 80 bp potential probes. 
+This can also serve as a benchmark and timing guide. The program finishes in ~ 2 minutes on a 12th Gen Intel i7-1255U, 16 GB RAM, laptop.
+
+```bash
+cd test
+time /home/user/probe_filter_app/bin/dna_probe_filter all_probes.fa
 ```
