@@ -1,4 +1,4 @@
-# DNA_probe_filter
+# P.H.A.J. - Probe Hybridization Analyzer in Julia
 Basic filtering of potential DNA hybridization probes based on GC content, homodimer and heterodimer formation, and melting temperature.
 
 ## Installation instructions
@@ -9,7 +9,7 @@ You will need to have Julia installed on your computer before starting. Julia ca
 
 Download the git repository using git or manually and change into the repository folder.
 ```bash
-git clone https://github.com/cookienocreams/Hybridization_probe_filter.git dna_probe_filter
+git clone https://github.com/cookienocreams/Phaj.git dna_probe_filter
 cd dna_probe_filter
 ```
 Activate the downloaded `julia` environment.
@@ -26,21 +26,21 @@ The last step is to create the precompiled executable. Make sure to set the corr
 
 ```julia
 using PackageCompiler
-PackageCompiler.create_app("./", "/home/user/probe_filter_app", incremental=true, precompile_execution_file="./src/dna_probe_filter.jl", include_lazy_artifacts=true)
+PackageCompiler.create_app("./", "/home/user/Phaj_app", incremental=true, precompile_execution_file="./src/Phaj.jl", include_lazy_artifacts=true)
 ```
 
 There are numerous options that can be changed if desired. Use `-h` or `--help` flags to see options.
 
 ```bash
-/home/user/probe_filter_app/bin/dna_probe_filter --help
+/home/user/Phaj_app/bin/Phaj --help
 ```
 
 ## Basic usage
 
-The app can be run using the `dna_probe_filter` executable in the `/home/user/probe_filter_app/bin` folder in a folder containing fasta to be analyzed. Note probes are expected to be in a standard fasta format with a different name for each probe.
+The app can be run using the `Phaj` executable in the `/home/user/Phaj_app/bin` folder in a folder containing fasta to be analyzed. Note probes are expected to be in a standard fasta format with a different name for each probe.
 
 ```bash
-/home/user/probe_filter_app/bin/dna_probe_filter sample.fasta
+/home/user/Phaj_app/bin/Phaj sample.fasta
 ```
 
 Using the sample input fasta file, `all_probes.fa`, in `test/`, the program can be test on a dataset which contains 5000 randomly generated 80 bp potential probes. 
@@ -48,5 +48,5 @@ This can also serve as a benchmark and timing guide. The program finishes in ~ 2
 
 ```bash
 cd test
-time /home/user/probe_filter_app/bin/dna_probe_filter all_probes.fa
+time /home/user/Phaj_app/bin/Phaj all_probes.fa
 ```
