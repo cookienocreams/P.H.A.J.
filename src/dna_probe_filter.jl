@@ -4,7 +4,6 @@ using ArgParse
 using BioAlignments
 using BioSequences
 using Random
-using DataStructures
 
 # Ideal gas constant R
 const gas_constant = 1.98720425864083 # cal*K−1*mol−1
