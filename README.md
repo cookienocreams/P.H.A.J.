@@ -9,8 +9,8 @@ You will need to have Julia installed on your computer before starting. Julia ca
 
 Download the git repository using git or manually and change into the repository folder.
 ```bash
-git clone https://github.com/cookienocreams/Phaj.git dna_probe_filter
-cd dna_probe_filter
+git clone https://github.com/cookienocreams/Phaj.git phaj
+cd phaj
 ```
 Activate the downloaded `julia` environment.
 ```julia
