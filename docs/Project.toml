@@ -1,18 +1,2 @@
-name = "docs"
-uuid = "9174205a-1b14-4a89-98b3-ea7d13d1d06a"
-authors = ["cookienocreams "]
-version = "0.1.0"
-
 [deps]
-ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
-BioAlignments = "00701ae9-d1dc-5365-b64a-a3a3ebf5695e"
-BioSequences = "7e6ae17a-c86d-528c-b3b9-7f778a29fe59"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
-Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test"]
