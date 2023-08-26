@@ -1,26 +1,26 @@
-using dna_probe_filter
+using Phaj
 using Test
 
-const dpf = dna_probe_filter
+const phj = Phaj
 
 @testset "purine_pyrimidine" begin
     @testset "standard prpy" begin
         probe = "TTTAAACCTCAGAGTGATACGCTCAGCTACCTGCAGCCGCCCCAACTAGTACGGCCATTTAAGGCGGAGTTATTTACATT"
-        result = dpf.prpy_sequence(probe)
+        result = phj.prpy_sequence(probe)
         expected = "YYYRRRYYYYRRRRYRRYRYRYYYRRYYRYYYRYRRYYRYYYYRRYYRRYRYRRYYRYYYRRRRYRRRRYYRYYYRYRYY"
         @test result == expected
     end
     
     @testset "all purine" begin
         probe = "AAAAAAAAAAAAAAAAAA"
-        result = dpf.prpy_sequence(probe)
+        result = phj.prpy_sequence(probe)
         expected = "RRRRRRRRRRRRRRRRRR"
         @test result == expected
     end
     
     @testset "all pyrimidine" begin
         probe = "TTTTTTTTTTTTTTTTTT"
-        result = dpf.prpy_sequence(probe)
+        result = phj.prpy_sequence(probe)
         expected = "YYYYYYYYYYYYYYYYYY"
         @test result == expected
     end
@@ -38,7 +38,7 @@ end
                                     , "CC, GG", "CG", "GA, CT", "GC", "TA"
         ]
         sequence_NN_list = ["AA", "TC", "AA", "CA", "AT", "CA"]
-        sum = dpf.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
+        sum = phj.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
         expected = (-46.69849087744854, -127.86147650004135)
         @test sum == expected
     end
@@ -54,7 +54,7 @@ end
                                     , "CC, GG", "CG", "GA, CT", "GC", "TA"
         ]
         sequence_NN_list::Vector{String} = []
-        sum = dpf.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
+        sum = phj.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
         expected = (0.0, 0.0)
         @test sum == expected
     end
@@ -70,7 +70,7 @@ end
                                     , "CC, GG", "CG", "GA, CT", "GC", "TA"
         ]
         sequence_NN_list = ["NN", "NN", "NN", "NN", "NN", "NN"]
-        sum = dpf.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
+        sum = phj.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
         expected = (0.0, 0.0)
         @test sum == expected
     end
@@ -86,7 +86,7 @@ end
                                     , "CC, GG", "CG", "GA, CT", "GC", "TA"
         ]
         sequence_NN_list = ["AA", "TC", "AA", "CA", "AT", "CA"]
-        sum = dpf.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
+        sum = phj.sequence_thermodynamic_sum(delta_h, delta_s, nn_pairs_list, sequence_NN_list)
         expected = (-46.69849087744854, -124.97869691034978) # delta s value is low
         @test sum == expected
     end
@@ -94,29 +94,29 @@ end
 
 @testset "percent_gc" begin
     @testset "standard gc" begin
-        probe = dpf.dna"TTTAAACCTCAGAGTGATACGCTCAGCTACCTGCAGCCGCCCCAACTAGTACGGCCATTTAAGGCGGAGTTATTTACATT"
-        result = dpf.gc_content(probe)
+        probe = phj.dna"TTTAAACCTCAGAGTGATACGCTCAGCTACCTGCAGCCGCCCCAACTAGTACGGCCATTTAAGGCGGAGTTATTTACATT"
+        result = phj.gc_content(probe)
         expected = 0.475
         @test result == expected
     end
     
     @testset "no GC" begin
-        probe = dpf.dna"AAAAAAAAAAAAAAAAAA"
-        result = dpf.gc_content(probe)
+        probe = phj.dna"AAAAAAAAAAAAAAAAAA"
+        result = phj.gc_content(probe)
         expected = 0.0
         @test result == expected
     end
     
     @testset "all GC" begin
-        probe = dpf.dna"GCGCGCGCGCGCGCGCGC"
-        result = dpf.gc_content(probe)
+        probe = phj.dna"GCGCGCGCGCGCGCGCGC"
+        result = phj.gc_content(probe)
         expected = 1.0
         @test result == expected
     end
 
     @testset "lowercase all GC" begin
-        probe = dpf.dna"gcgcgcgcgcgcgcgcgc"
-        result = dpf.gc_content(probe)
+        probe = phj.dna"gcgcgcgcgcgcgcgcgc"
+        result = phj.gc_content(probe)
         expected = 1.0
         @test result == expected
     end
@@ -125,21 +125,21 @@ end
 @testset "suffix testing" begin
     @testset "standard suffix array" begin
         probe = "TTTAAACCTC"
-        result = dpf.build_suffix_array(probe)
+        result = phj.build_suffix_array(probe)
         expected = [4, 5, 6, 10, 7, 8, 3, 9, 2, 1]
         @test result == expected
     end
     
     @testset "same base suffix array" begin
         probe = "AAAAAAAAAA"
-        result = dpf.build_suffix_array(probe)
+        result = phj.build_suffix_array(probe)
         expected = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
         @test result == expected
     end
     
     @testset "empty suffix array" begin
         probe = ""
-        result = dpf.build_suffix_array(probe)
+        result = phj.build_suffix_array(probe)
         expected = Int64[]
         @test result == expected
     end
@@ -149,7 +149,7 @@ end
     @testset "standard lcp" begin
         probe = "TTTAAACCTC"
         suffix_array = [4, 5, 6, 10, 7, 8, 3, 9, 2, 1]
-        result = dpf.build_longest_common_prefix(probe, suffix_array)
+        result = phj.build_longest_common_prefix(probe, suffix_array)
         expected = [2, 1, 0, 1, 1, 0, 1, 1, 2]
         @test result == expected
     end
@@ -157,7 +157,7 @@ end
     @testset "same base suffix array into lcp" begin
         probe = "AAAAAAAAAA"
         suffix_array = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-        result = dpf.build_longest_common_prefix(probe, suffix_array)
+        result = phj.build_longest_common_prefix(probe, suffix_array)
         expected = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         @test result == expected
     end
@@ -165,15 +165,15 @@ end
 
 @testset "homodimer testing" begin
     @testset "standard homodimer" begin
-        probe = dpf.dna"TTTAAACCTC"
-        result = dpf.find_homodimers(probe)
+        probe = phj.dna"TTTAAACCTC"
+        result = phj.find_homodimers(probe)
         expected = ["AAA", "A", "TAAA", "T", "TTAAA", "TT", "TTTAAA"]
         @test result == expected
     end
     
     @testset "no homodimer" begin
-        probe = dpf.dna"AAAAAAAAAA"
-        result = dpf.find_homodimers(probe)
+        probe = phj.dna"AAAAAAAAAA"
+        result = phj.find_homodimers(probe)
         expected = String[]
         @test result == expected
     end
@@ -187,8 +187,8 @@ end
         oligo_concentration = 2 * 1e-6
         dNTP_concentration = 0.0
         mg_concentration = 2.0
-        nn_parameters = dpf.nn_params()
-        result = dpf.check_probe_tm(probe
+        nn_parameters = phj.nn_params()
+        result = phj.check_probe_tm(probe
                                     , threshold
                                     , monovalent_concentration
                                     , nn_parameters
@@ -207,8 +207,8 @@ end
         oligo_concentration = 2 * 1e-6
         dNTP_concentration = 0.0
         mg_concentration = 2.0
-        nn_parameters = dpf.nn_params()
-        result = dpf.check_probe_tm(probe
+        nn_parameters = phj.nn_params()
+        result = phj.check_probe_tm(probe
                                     , threshold
                                     , monovalent_concentration
                                     , nn_parameters
@@ -225,7 +225,7 @@ end
     @testset "standard slicing" begin
         probe = "CGTGCGCCACTAGACTTGGCAAGGCGTGGAACCGATACCTGCTACCGTGTTAGCAACAAACAGCTATCAACACAGCCATG"
         slice_size = 40
-        result = dpf.slice_probe(probe, slice_size)
+        result = phj.slice_probe(probe, slice_size)
         expected = ["CGTGCGCCACTAGACTTGGCAAGGCGTGGAACCGATACCT", "GCTACCGTGTTAGCAACAAACAGCTATCAACACAGCCATG"]
         @test result == expected
     end
@@ -233,7 +233,7 @@ end
     @testset "smaller probe" begin
         probe = "CGTGCGCCACTAGACT"
         slice_size = 10
-        result = dpf.slice_probe(probe, slice_size)
+        result = phj.slice_probe(probe, slice_size)
         expected = ["CGTGCGCCAC", "TAGACT"]
         @test result == expected
     end
@@ -241,7 +241,7 @@ end
     @testset "slice size larger than probe" begin
         probe = "CGTGCG"
         slice_size = 10
-        result = dpf.slice_probe(probe, slice_size)
+        result = phj.slice_probe(probe, slice_size)
         expected = ["CGTGCG"]
         @test result == expected
     end
@@ -251,16 +251,16 @@ end
     @testset "standard calculate thermodynamic parameters" begin
         probe = "TTTAAACCTC"
         monovalent = 50.0
-        nn_parameters = dpf.nn_params()
-        result = dpf.calculate_thermodynamic_parameters(probe, monovalent, nn_parameters)
+        nn_parameters = phj.nn_params()
+        result = phj.calculate_thermodynamic_parameters(probe, monovalent, nn_parameters)
         expected = (-16.34967482535437, -68.27672604280126, -190.10452578234262)
         @test result == expected
     end
 
     @testset "no end base tm adjustment" begin
         probe = "TTTAAACCTC"
-        nn_parameters = dpf.nn_params()
-        result = dpf.calculate_thermodynamic_parameters(probe, nn_parameters)
+        nn_parameters = phj.nn_params()
+        result = phj.calculate_thermodynamic_parameters(probe, nn_parameters)
         expected = (-17.623420349169535, -69.55047156661642, -190.10452578234262)
         @test result == expected
     end
@@ -268,8 +268,8 @@ end
     @testset "all same base" begin
         probe = "AAAAAAAAAA"
         monovalent = 50.0
-        nn_parameters = dpf.nn_params()
-        result = dpf.calculate_thermodynamic_parameters(probe, monovalent, nn_parameters)
+        nn_parameters = phj.nn_params()
+        result = phj.calculate_thermodynamic_parameters(probe, monovalent, nn_parameters)
         expected = (-16.017285560664035, -70.48109267653723, -199.39156915933808)
         @test result == expected
     end
@@ -277,8 +277,8 @@ end
     @testset "all N bases" begin
         probe = "NNNNNNNNNN"
         monovalent = 50.0
-        nn_parameters = dpf.nn_params()
-        result = dpf.calculate_thermodynamic_parameters(probe, monovalent, nn_parameters)
+        nn_parameters = phj.nn_params()
+        result = phj.calculate_thermodynamic_parameters(probe, monovalent, nn_parameters)
         expected = (1.273745523815161, 1.273745523815161, 0.0)
         @test result == expected
     end
@@ -286,86 +286,86 @@ end
 
 @testset "longest aligned region testing" begin
     @testset "standard longest aligned region" begin
-        region = dpf.Region(0, 0)
-        scoremodel = dpf.AffineGapScoreModel(
+        region = phj.Region(0, 0)
+        scoremodel = phj.AffineGapScoreModel(
                match=5,
                mismatch=-4,
                gap_open=-5,
                gap_extend=-3
         )
-        probe_a = dpf.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
-        probe_b = dpf.dna"TTTAAAGGCAATGGCCGGAAAATAAAGAGGGTGGCGCGGCCGATGACGCTGTCATGTGGCTACGGTTACAAGTAGATCGC"
-        alignment_result = dpf.pairalign(dpf.SemiGlobalAlignment()
+        probe_a = phj.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
+        probe_b = phj.dna"TTTAAAGGCAATGGCCGGAAAATAAAGAGGGTGGCGCGGCCGATGACGCTGTCATGTGGCTACGGTTACAAGTAGATCGC"
+        alignment_result = phj.pairalign(phj.SemiGlobalAlignment()
                                         , probe_a
-                                        , dpf.reverse_complement(probe_b)
+                                        , phj.reverse_complement(probe_b)
                                         , scoremodel
         )
-        alignment_anchors = dpf.alignment(alignment_result).a.aln.anchors
-        dpf.longest_aligned_region!(region, alignment_anchors)
-        expected = dpf.Region(19, 25)
+        alignment_anchors = phj.alignment(alignment_result).a.aln.anchors
+        phj.longest_aligned_region!(region, alignment_anchors)
+        expected = phj.Region(19, 25)
         @test region.start == expected.start
     end
 
     @testset "non-standard bases" begin
-        region = dpf.Region(0, 0)
-        scoremodel = dpf.AffineGapScoreModel(
+        region = phj.Region(0, 0)
+        scoremodel = phj.AffineGapScoreModel(
                match=5,
                mismatch=-4,
                gap_open=-5,
                gap_extend=-3
         )
-        probe_a = dpf.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
-        probe_b = dpf.dna"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
-        alignment_result = dpf.pairalign(dpf.SemiGlobalAlignment()
+        probe_a = phj.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
+        probe_b = phj.dna"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+        alignment_result = phj.pairalign(phj.SemiGlobalAlignment()
                                         , probe_a
-                                        , dpf.reverse_complement(probe_b)
+                                        , phj.reverse_complement(probe_b)
                                         , scoremodel
         )
-        alignment_anchors = dpf.alignment(alignment_result).a.aln.anchors
-        dpf.longest_aligned_region!(region, alignment_anchors)
-        expected = dpf.Region(0, 0)
+        alignment_anchors = phj.alignment(alignment_result).a.aln.anchors
+        phj.longest_aligned_region!(region, alignment_anchors)
+        expected = phj.Region(0, 0)
         @test region.start == expected.start
     end
 
     @testset "truncated probe" begin
-        region = dpf.Region(0, 0)
-        scoremodel = dpf.AffineGapScoreModel(
+        region = phj.Region(0, 0)
+        scoremodel = phj.AffineGapScoreModel(
                match=5,
                mismatch=-4,
                gap_open=-5,
                gap_extend=-3
         )
-        probe_a = dpf.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
-        probe_b = dpf.dna"TTTAAAGGCAATGGCCGGAAAATAAAGAGGGTGGCGCGGC"
-        alignment_result = dpf.pairalign(dpf.SemiGlobalAlignment()
+        probe_a = phj.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
+        probe_b = phj.dna"TTTAAAGGCAATGGCCGGAAAATAAAGAGGGTGGCGCGGC"
+        alignment_result = phj.pairalign(phj.SemiGlobalAlignment()
                                         , probe_a
-                                        , dpf.reverse_complement(probe_b)
+                                        , phj.reverse_complement(probe_b)
                                         , scoremodel
         )
-        alignment_anchors = dpf.alignment(alignment_result).a.aln.anchors
-        dpf.longest_aligned_region!(region, alignment_anchors)
-        expected = dpf.Region(74, 78)
+        alignment_anchors = phj.alignment(alignment_result).a.aln.anchors
+        phj.longest_aligned_region!(region, alignment_anchors)
+        expected = phj.Region(74, 78)
         @test region.start == expected.start
     end
 
     @testset "missing probe" begin
-        region = dpf.Region(0, 0)
-        scoremodel = dpf.AffineGapScoreModel(
+        region = phj.Region(0, 0)
+        scoremodel = phj.AffineGapScoreModel(
                match=5,
                mismatch=-4,
                gap_open=-5,
                gap_extend=-3
         )
-        probe_a = dpf.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
-        probe_b = dpf.dna""
-        alignment_result = dpf.pairalign(dpf.SemiGlobalAlignment()
+        probe_a = phj.dna"GCGGAGGTGACAATGGTCTACCGTATCATGCCACGAACGGTAGCAGAGCATGAACGTCGATGGCTCCCGAAGTGTTTATG"
+        probe_b = phj.dna""
+        alignment_result = phj.pairalign(phj.SemiGlobalAlignment()
                                         , probe_a
-                                        , dpf.reverse_complement(probe_b)
+                                        , phj.reverse_complement(probe_b)
                                         , scoremodel
         )
-        alignment_anchors = dpf.alignment(alignment_result).a.aln.anchors
-        dpf.longest_aligned_region!(region, alignment_anchors)
-        expected = dpf.Region(0, 0)
+        alignment_anchors = phj.alignment(alignment_result).a.aln.anchors
+        phj.longest_aligned_region!(region, alignment_anchors)
+        expected = phj.Region(0, 0)
         @test region.start == expected.start
     end
 end
@@ -378,7 +378,7 @@ end
         dNTPs = 0.0
         probe_gc = .56
         probe_length = 120
-        result = dpf.probe_tm_salt_correction(melting_temperature
+        result = phj.probe_tm_salt_correction(melting_temperature
                                             , monovalent
                                             , magnesium
                                             , dNTPs
@@ -396,7 +396,7 @@ end
         dNTPs = 0.0
         probe_gc = .56
         probe_length = 120
-        result = dpf.probe_tm_salt_correction(melting_temperature
+        result = phj.probe_tm_salt_correction(melting_temperature
                                             , monovalent
                                             , magnesium
                                             , dNTPs
@@ -414,7 +414,7 @@ end
         dNTPs = 0.0
         probe_gc = .56
         probe_length = 120
-        result = dpf.probe_tm_salt_correction(melting_temperature
+        result = phj.probe_tm_salt_correction(melting_temperature
                                             , monovalent
                                             , magnesium
                                             , dNTPs
@@ -432,7 +432,7 @@ end
         dNTPs = 0.0
         probe_gc = .56
         probe_length = 0
-        result = dpf.probe_tm_salt_correction(melting_temperature
+        result = phj.probe_tm_salt_correction(melting_temperature
                                             , monovalent
                                             , magnesium
                                             , dNTPs
