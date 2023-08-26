@@ -483,7 +483,7 @@ function filter_probes(probes::Vector{String}
             longest_aligned_region!(region, alignment_anchors)
             aligned_seq = current_probe[region.start+1:region.stop]
 
-            # Skip probes that have more than 5 bp of alignment to other probes
+            # Skip probes that have more alignment to other probes than set bp threshold
             if length(aligned_seq) > max_aligned_length
                 continue
             end
