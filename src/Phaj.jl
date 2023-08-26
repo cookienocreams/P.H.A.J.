@@ -1,4 +1,4 @@
-module dna_probe_filter
+module Phaj
 
 using ArgParse
 using BioAlignments
@@ -881,9 +881,44 @@ function read_fasta(input_fasta::String)
 end
 
 """
-    parse_commandline()
+    parse_commandline() -> Dict
 
- Get arguments from the command line.
+Parse and collect command line arguments.
+
+# Description
+This function fetches user-defined parameters for filtering potential DNA hybridization probes.
+The parameters include monovalent ion concentration, magnesium concentration, dNTP concentration, 
+probe oligo concentration, reaction temperature, homodimer sequence melting temperature, 
+delta G threshold, GC content bounds, maximum length of complementary base pairs, and 
+input/output filenames.
+
+# Returns
+
+- A dictionary containing user-defined parameters.
+
+# Command line arguments:
+
+- `--mono, -m`: Monovalent ion concentration in reaction (default: 50.0 mM).
+- `--mg, -M`: Magnesium concentration in reaction (default: 2.0 mM).
+- `--dntps, -d`: dNTP concentration in reaction (default: 0.0 mM).
+- `--oligo, -c`: Total probe oligo concentration in reaction (default: 0.25 μM).
+- `--temp, -t`: Reaction temperature, serving as a melting temperature threshold for probes (default: 65°C).
+- `--heterodimer, -H`: Maximum allowed homodimer sequence melting temperature (default: 25°C).
+- `--delta-g, -G`: Delta G threshold, below which homodimer sequences are not allowed (default: -10.0).
+- `--upper, -u`: Upper bound for percent GC (e.g., 0.7 for 70% GC; default: 0.6).
+- `--lower, -l`: Lower bound for percent GC (e.g., 0.45 for 45% GC; default: 0.4).
+- `--max, -L`: Maximum length of complementary base pairs a probe can have with other probes (default: 5).
+- `--out, -o`: Output filename for a fasta containing promising probes (default: "promising_probes.fa").
+- `fasta`: Input fasta file containing hybridization probes to be filtered (required).
+
+# Example
+```julia
+# Get arguements from the command-line
+parsed_args = parse_commandline()
+for (arg,val) in parsed_args
+    println("  \$arg  =>  \$val")
+end
+```
 """
 function parse_commandline()
     settings = ArgParseSettings(prog="Hybridization Probe Filter"
@@ -974,4 +1009,4 @@ function julia_main()::Cint
     return 0
 end
 
-end # module dna_probe_filter
+end # module Phaj
