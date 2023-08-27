@@ -1,6 +1,8 @@
 # P.H.A.J. - Probe Hybridization Analyzer in Julia
 Basic filtering of potential DNA hybridization probes based on GC content, homodimer and heterodimer formation, and melting temperature.
 
+[![Documentation](https://github.com/cookienocreams/Phaj/actions/workflows/documentation.yml/badge.svg)](https://github.com/cookienocreams/Phaj/actions/workflows/documentation.yml)
+
 ## Installation instructions
 
 Create executable to run on local machine using the `julia` library `PackageCompiler`:
