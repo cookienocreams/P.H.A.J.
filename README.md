@@ -46,7 +46,7 @@ The app can be run using the `Phaj` executable in the `/home/user/Phaj_app/bin` 
 ```
 
 Using the sample input fasta file, `all_probes.fa`, in `test/`, the program can be test on a dataset which contains 5000 randomly generated 80 bp potential probes. 
-This can also serve as a benchmark and timing guide. The program finishes in ~ 2 minutes on a 12th Gen Intel i7-1255U, 16 GB RAM, laptop.
+This can also serve as a benchmark and timing guide. The program finishes in ~ 3 minutes on a 12th Gen Intel i7-1255U, 16 GB RAM, laptop.
 
 ```bash
 cd test
